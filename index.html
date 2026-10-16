@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YStore - Game Store Top Up</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+<div class="logo">YSTORE</div>
+<div class="search-bar"><input id="search" placeholder="Cari game..."></div>
+<button class="cart-btn">Cart</button>
+</header>
+
+<div class="hero">
+<h1>TOP UP GAME PALING MURAH</h1>
+<p>Bayar di Website, Saldo Langsung Masuk ke Akun Game Perusahaan. 100% Aman & Instan.</p>
+<div class="badge">Proses 10 Detik - 5 Menit</div>
+</div>
+
+<div class="container">
+<div class="filter" id="filter">
+<button class="active" onclick="filterGame('all')">Semua</button>
+<button onclick="filterGame('topup')">Top Up</button>
+<button onclick="filterGame('berbayar')">Berbayar</button>
+</div>
+
+<h2 class="section-title">Daftar Game</h2>
+<div class="games-grid" id="gamesGrid"></div>
+
+<div class="note">
+<b>Cara Kerja:</b> Kamu bayar di website ini, kami teruskan ke Perusahaan Game resmi (Moonton, HoYoverse, Tencent, dll), Diamond/Item masuk otomatis ke User ID kamu.
+</div>
+</div>
+
+<footer>
+© 2026 YStore - Pembayaran: QRIS, DANA, OVO, GoPay, BCA, Alfamart
+</footer>
+
+<div class="modal" id="checkoutModal">
+<div class="modal-content">
+<span class="close" onclick="closeModal()">X</span>
+<h2 id="modalGameName"></h2>
+<img id="modalGameImg" src="" alt="">
+<label>Masukkan User ID Game</label>
+<input class="userid-input" id="userId" placeholder="Contoh: 12345678">
+<div id="packageList"></div>
+<label>Pilih Pembayaran</label>
+<select id="payMethod">
+<option>QRIS</option>
+<option>DANA</option>
+<option>OVO</option>
+<option>GoPay</option>
+<option>BCA</option>
+<option>Alfamart</option>
+</select>
+<button class="btn-buy" onclick="processOrder()">Bayar Sekarang</button>
+</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
