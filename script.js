@@ -8,8 +8,13 @@ let selectedPackage = null;
 
 async function loadGames(){
   const { data, error } = await db.from('games').select('*').order('id');
-  if(error){ console.error(error); return; }
+  if(error){
+    console.error(error);
+    document.getElementById('gamesGrid').innerHTML = "<p style='color:#888'>Gagal load: " + error.message + "</p>";
+    return;
+  }
   games = data.map(g => ({
+    id: g.id,
     name: g.name,
     publisher: g.publisher,
     icon: g.icon_url,
@@ -22,12 +27,22 @@ async function loadGames(){
 function renderGames(list){
   const grid = document.getElementById('gamesGrid');
   grid.innerHTML = "";
+  if(list.length === 0){
+    grid.innerHTML = "<p style='color:#888'>Game tidak ditemukan</p>";
+    return;
+  }
   list.forEach(g=>{
     const card = document.createElement('div');
     card.className = "game-card";
     card.onclick = ()=> openCheckout(g);
-    card.innerHTML = `<img src="${g.icon}" onerror="this.src='https://via.placeholder.com/300x300/111/fff?text='+encodeURIComponent(g.name)">
-    <div class="info"><h3>${g.name}</h3><p>${g.publisher} - ${g.category}</p><div class="price">Mulai Rp ${g.packages[0].price.toLocaleString('id-ID')}</div></div>`;
+    card.innerHTML = `
+      <img src="${g.icon}" alt="${g.name}">
+      <div class="info">
+        <h3>${g.name}</h3>
+        <p>${g.publisher} • ${g.category}</p>
+        <div class="price">Mulai Rp ${g.packages[0].price.toLocaleString('id-ID')}</div>
+      </div>
+    `;
     grid.appendChild(card);
   });
 }
@@ -35,8 +50,11 @@ function renderGames(list){
 function filterGame(cat){
   document.querySelectorAll('#filter button').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
-  if(cat==='all') renderGames(games);
-  else renderGames(games.filter(g=> g.category === cat));
+  if(cat === 'all'){
+    renderGames(games);
+  } else {
+    renderGames(games.filter(g=> g.category === cat));
+  }
 }
 
 document.getElementById('search').addEventListener('input', (e)=>{
@@ -55,17 +73,26 @@ function openCheckout(game){
     const div = document.createElement('div');
     div.className = "package";
     div.innerHTML = `<span>${p.label}</span><b>Rp ${p.price.toLocaleString('id-ID')}</b>`;
-    div.onclick = ()=>{ selectedPackage = p; document.querySelectorAll('.package').forEach(x=>x.style.borderColor="#333"); div.style.borderColor="#fff"; };
+    div.onclick = ()=>{
+      selectedPackage = p;
+      document.querySelectorAll('.package').forEach(x=>x.style.borderColor="#333");
+      div.style.borderColor="#fff";
+    };
     pl.appendChild(div);
   });
   document.getElementById('checkoutModal').classList.add('active');
 }
 
-function closeModal(){ document.getElementById('checkoutModal').classList.remove('active'); }
+function closeModal(){
+  document.getElementById('checkoutModal').classList.remove('active');
+}
 
 async function processOrder(){
   const userId = document.getElementById('userId').value.trim();
-  if(!userId){ alert("Isi User ID dulu!"); return; }
+  if(!userId){
+    alert("Isi User ID dulu!");
+    return;
+  }
   const pay = document.getElementById('payMethod').value;
   const { error } = await db.from('orders').insert([{
     game: selectedGame.name,
@@ -75,8 +102,11 @@ async function processOrder(){
     payment: pay,
     status: 'pending'
   }]);
-  if(error){ alert("Gagal: "+error.message); return; }
-  alert(`Order berhasil!\nGame: ${selectedGame.name}\nPaket: ${selectedPackage.label}\nBayar via: ${pay}\nUser ID: ${userId}`);
+  if(error){
+    alert("Gagal: " + error.message);
+    return;
+  }
+  alert(`Order berhasil!\nGame: ${selectedGame.name}\nPaket: ${selectedPackage.label}\nBayar via: ${pay}\nUser ID: ${userId}\n\nUang diteruskan ke publisher ${selectedGame.publisher}`);
   closeModal();
 }
 
